@@ -101,14 +101,9 @@ for year in years:
             ticker_vs_avg_monthly_ret.loc[len(ticker_vs_avg_monthly_ret)]=[i,np.sum(daily_return),f'{month}-{year}']
             ticker_vs_avg_monthly_ret=ticker_vs_avg_monthly_ret.sort_values(by=['monthly_return'],ascending=False)
         if filtered_df.empty:
-            print('Here')
             filtered_df=ticker_vs_avg_monthly_ret.head(5)
-            print(filtered_df['Month-Year'].unique())
         else:
-            print('Here2')
             filtered_df=pd.concat([filtered_df,ticker_vs_avg_monthly_ret.head(5)],axis=0)
-            print(filtered_df['Month-Year'].unique())
-        print('Here3')
         filtered_df=pd.concat([filtered_df,ticker_vs_avg_monthly_ret.tail(5)],axis=0)
         print(filtered_df['Month-Year'].unique())
 filtered_df.to_csv(f'{dest_dir}MonthReturnTickerData.csv',index=False)
