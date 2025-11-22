@@ -72,7 +72,7 @@ print(ticker_vs_metrics.head(5))
 ticker_vs_metrics=ticker_vs_metrics.join(sector_df.set_index('Ticker'),on="Ticker")
 print(ticker_vs_metrics)
 
-#ticker_vs_metrics.to_csv(f'{dest_dir}TickerVsVolatileSectorReturnData.csv',index=True)
+ticker_vs_metrics.to_csv(f'{dest_dir}TickerVsVolatileSectorReturnData.csv',index=True)
 print('Captured data of Sector wise Yearly performance - by grouping each Ticker')
 
 # 4. Correlation between Tickers
@@ -83,7 +83,7 @@ corr_data=corr_data.drop(columns=['Year','Date','Month'])
 corr_df=corr_data.pivot(index='calendar_date', columns='Ticker', values='close')
 print(corr_df.head(5)) 
 corr_chart=corr_df.pct_change().corr()
-#corr_chart.to_csv(f'{dest_dir}CorrelationTickerData.csv',index=True)
+corr_chart.to_csv(f'{dest_dir}CorrelationTickerData.csv',index=True)
 print('Captured Correlation matrix between each Ticker close price')
 
 #5. Month wise Data
@@ -111,7 +111,7 @@ for year in years:
         print('Here3')
         filtered_df=pd.concat([filtered_df,ticker_vs_avg_monthly_ret.tail(5)],axis=0)
         print(filtered_df['Month-Year'].unique())
-#filtered_df.to_csv(f'{dest_dir}MonthReturnTickerData.csv',index=False)
+filtered_df.to_csv(f'{dest_dir}MonthReturnTickerData.csv',index=False)
 print('Captured Top 5 Gainer and Loser Tickers by each month for a calendar year')
 
 #2. CumulativeReturnData
