@@ -8,7 +8,7 @@ Current Features:
          Prompt will appear to get Source Directory for Reading the source file(s) and to get Destination directory to write Ticker wise csv data.
 
 2. Stock Analysis GUI - Streamlit app that gives visualization on different perspective of stock trends
-         cmd - streamlit run /ArchieveDataStockAnalysis/stock_analysis_engine.py <SRC_DIR_PATH>
+         cmd - streamlit run /ArchieveDataStockAnalysis/stock_analysis_engine.py <SRC_STOCK_DATA_DIR_PATH> <SECTOR_TICKER_RELATION_FILE_PATH>
 
 3. Provides consildated files on each terms of stock performance and trends. Which can be used in Power BI/Tableau to play around with rendered data file.
          cmd - python /ArchieveDataStockAnalysis/tableau_analysis_data.py
