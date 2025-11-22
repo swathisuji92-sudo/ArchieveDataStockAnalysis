@@ -24,10 +24,11 @@ def daily_return_of_stock(sorted_ticker_wise_data):
 
 if len(sys.argv) > 1:
         src_file_dir = sys.argv[1]
+        src_sector_file_path = sys.argv[2]
         print('src file dir::',src_file_dir)
 else:
     sys.exit(5)
-#src_file_dir='/Users/manikandan/Documents/Sujitha/stockAnalysis/csvData/'
+
 csv_files = glob.glob(os.path.join(src_file_dir, "*.csv"))
 csv_data=pd.DataFrame()
 for f in csv_files:
@@ -77,19 +78,20 @@ elif analOption == "Cumulative Return for Top 5 Performing Stocks":
                 cum_ret.append(final_cum_return)
                 prev_close_price=close_price
             ind_cum_ret[i]=cum_ret
-            cum_ret_anal[i]=final_cum_return
+            cum_ret_anal[i]=np.sum(ind_cum_ret[i])
 
     cum_ret_anal_df=pd.DataFrame.from_dict(cum_ret_anal,orient='index',columns=['cumulative_return'])
     cum_ret_anal_df=cum_ret_anal_df.sort_values(by=['cumulative_return'],ascending=False,axis=0)
     print(cum_ret_anal_df.head(10))
     for i in cum_ret_anal_df.head(5).index:
         ind_cum_ret_df=pd.DataFrame({i:ind_cum_ret[i]})
+        total=np.sum(ind_cum_ret[i])
+        st.write(f'### Cumulative Return of "{i}" = {total:.2f}')
         st.line_chart(ind_cum_ret_df,x_label=i,y_label="Cumulative Return")
 
 elif analOption == "Average Yearly Return by Sector":
 
-    sector_file_dir='/Users/manikandan/Documents/Sujitha/stockAnalysis/'
-    sector_df=pd.read_csv('/Users/manikandan/Documents/Sujitha/stockAnalysis/Sector_data-Sheet1.csv')
+    sector_df=pd.read_csv(src_sector_file_path)
     sector_df['Ticker']=sector_df.apply(lambda x : str(x['Symbol']).split(':')[1].strip(), axis=1)
     sector_df=sector_df.drop(columns=['COMPANY','Symbol'])
     sector_df.loc[sector_df['Ticker']=='ADANIGREEN','Ticker']='ADANIENT'
@@ -123,13 +125,20 @@ elif analOption=='Stock Price Correlation Heatmap':
     corr_data=csv_data[['Ticker','close','Date','Month','Year']]
     corr_data['calendar_date']=corr_data.apply(lambda x: '-'.join([str(x['Year']),str(x['Month']),str(x['Date'])]),axis=1)
     corr_data=corr_data.drop(columns=['Year','Date','Month'])
-    print(corr_data.head(10))
     corr_df=corr_data.pivot(index='calendar_date', columns='Ticker', values='close')
-    print(corr_df.head(5)) 
     corr_chart=corr_df.pct_change().corr()
-    fig, ax = plt.subplots(figsize=(25, 25))
-    sns.heatmap(corr_chart, annot=False, cmap='coolwarm', fmt=".2f", linewidths=.5, ax=ax)
-    st.pyplot(fig,width="stretch")
+    print(corr_chart.head(5))
+    
+    ticker_name=st.selectbox('Select Ticker for which correlation stats is needed:',(unique_ticker),placeholder="----Select Ticker----")
+
+    if ticker_name != "":
+        sorted_corr_data=corr_chart[[f'{ticker_name}']]
+        print(sorted_corr_data.head(5))
+        sorted_corr_data=sorted_corr_data[sorted_corr_data[f'{ticker_name}'] < 1.0].sort_values(by=[f'{ticker_name}'],ascending=False)
+        print(sorted_corr_data.head(10)) 
+        fig, ax = plt.subplots(figsize=(5, 5))
+        sns.heatmap(sorted_corr_data.head(10), annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5, ax=ax)
+        st.pyplot(fig)
 
 elif analOption=='Top 5 Gainers and Losers by Month':
     years=csv_data['Year'].unique()

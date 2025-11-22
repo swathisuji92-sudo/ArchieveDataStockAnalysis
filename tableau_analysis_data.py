@@ -72,7 +72,7 @@ print(ticker_vs_metrics.head(5))
 ticker_vs_metrics=ticker_vs_metrics.join(sector_df.set_index('Ticker'),on="Ticker")
 print(ticker_vs_metrics)
 
-ticker_vs_metrics.to_csv(f'{dest_dir}TickerVsVolatileSectorReturnData.csv',index=True)
+#ticker_vs_metrics.to_csv(f'{dest_dir}TickerVsVolatileSectorReturnData.csv',index=True)
 print('Captured data of Sector wise Yearly performance - by grouping each Ticker')
 
 # 4. Correlation between Tickers
@@ -83,7 +83,7 @@ corr_data=corr_data.drop(columns=['Year','Date','Month'])
 corr_df=corr_data.pivot(index='calendar_date', columns='Ticker', values='close')
 print(corr_df.head(5)) 
 corr_chart=corr_df.pct_change().corr()
-corr_chart.to_csv(f'{dest_dir}CorrelationTickerData.csv',index=True)
+#corr_chart.to_csv(f'{dest_dir}CorrelationTickerData.csv',index=True)
 print('Captured Correlation matrix between each Ticker close price')
 
 #5. Month wise Data
@@ -111,7 +111,7 @@ for year in years:
         print('Here3')
         filtered_df=pd.concat([filtered_df,ticker_vs_avg_monthly_ret.tail(5)],axis=0)
         print(filtered_df['Month-Year'].unique())
-filtered_df.to_csv(f'{dest_dir}MonthReturnTickerData.csv',index=False)
+#filtered_df.to_csv(f'{dest_dir}MonthReturnTickerData.csv',index=False)
 print('Captured Top 5 Gainer and Loser Tickers by each month for a calendar year')
 
 #2. CumulativeReturnData
@@ -119,25 +119,24 @@ print('Capture Cumulative return for each Ticker and fetch top 5 Gainers to view
 cum_ret_anal={}
 ind_cum_ret={}
 for i in unique_ticker:
-        ticker_wise_data = csv_data[csv_data['Ticker']==i]
-        sorted_ticker_wise_data=ticker_wise_data.sort_values(by=['Year','Month','Date'],ascending=True)
-        final_cum_return=0.0
-        cum_ret=[]
-        daily_return=0.0
-        prev_close_price = 0.0
-        skipSymbolFirstFlag=True
-        for rec in sorted_ticker_wise_data.itertuples(index=False):
-            close_price=float(rec[1])
-            if skipSymbolFirstFlag:
-                skipSymbolFirstFlag=False
-            else:
-                daily_return=((close_price-prev_close_price)/prev_close_price)
-            #print(cum_return,'----',daily_return)
-            final_cum_return+=daily_return
-            cum_ret.append(final_cum_return)
-            prev_close_price=close_price
-        ind_cum_ret[i]=cum_ret
-        cum_ret_anal[i]=final_cum_return
+    ticker_wise_data = csv_data[csv_data['Ticker']==i]
+    sorted_ticker_wise_data=ticker_wise_data.sort_values(by=['Year','Month','Date'],ascending=True)
+    final_cum_return=0.0
+    cum_ret=[]
+    daily_return=0.0
+    prev_close_price = 0.0
+    skipSymbolFirstFlag=True
+    for rec in sorted_ticker_wise_data.itertuples(index=False):
+        close_price=float(rec[1])
+        if skipSymbolFirstFlag:
+            skipSymbolFirstFlag=False
+        else:
+            daily_return=((close_price-prev_close_price)/prev_close_price)
+        final_cum_return+=daily_return
+        cum_ret.append(final_cum_return)
+        prev_close_price=close_price
+    ind_cum_ret[i]=cum_ret
+    cum_ret_anal[i]=np.sum(ind_cum_ret[i])
 
 cum_ret_anal_df=pd.DataFrame.from_dict(cum_ret_anal,orient='index',columns=['cumulative_return'])
 cum_ret_anal_df=cum_ret_anal_df.sort_values(by=['cumulative_return'],ascending=False,axis=0)
